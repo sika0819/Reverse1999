@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text;
 public class Gesture
 {
     #region 常量
@@ -40,6 +41,8 @@ public class Gesture
     public Gesture()
     {
         gestures = new List<GestureProperties>();
+        moves = new List<float>();
+        points = new List<Vector2>();
         BuildAngleMap();
     }
     /// <summary>
@@ -145,7 +148,7 @@ public class Gesture
     }
     private void MatchGesture()
     {
-        int bestCost = 1000000;
+        int bestCost = 50;
         int cost = 0;
         int[] gest;
         if(moves.Count == 0){
@@ -164,15 +167,13 @@ public class Gesture
         string bestGesture = string.Empty;
         Rect irect = new Rect(rect.xMin, rect.yMin, rect.xMax - rect.xMin, rect.yMax - rect.yMin);
         GestureInfos infos = new GestureInfos(new GestureData(imoves, ppoints, lastPoint, irect));
-      
+        GestureProperties bestProperty = gestures[0];
         for (int i = 0; i < gestures.Count; i++)
         {
             gest = (gestures[i] as GestureProperties).Moves;
             infos.Present = (gestures[i] as GestureProperties).Present;
             cost = CostLeven(gest, imoves);
-            for(int j=0;j<gest.Length;j++){
-                Debug.LogFormat("move:{0},Present:{1},cost:{2}",gest[j], infos.Present,cost);
-            }
+           
             if (cost <= DEFAULT_FIABILITY)
             {
                 if ((gestures[i] as GestureProperties).match != null)
@@ -183,17 +184,28 @@ public class Gesture
                 if (cost < bestCost)
                 {
                     bestCost = cost;
+                    bestProperty = gestures[i] as GestureProperties;
                     bestGesture = (gestures[i] as GestureProperties).Present;
                 }
             }
         }
+        if(bestProperty!=null){
+            StringBuilder stringBuilder = new StringBuilder();
+            for(int i=0;i<bestProperty.Moves.Length;i++){
+                stringBuilder.Append(bestProperty.Moves[i]);
+                stringBuilder.Append(",");
+            }
+            Debug.LogFormat("stringBuilder:{0}",stringBuilder.ToString());
+        }
+    
         if (!string.IsNullOrEmpty(bestGesture))
         {
             GestureEventArgs args = new GestureEventArgs();
             args.Present = bestGesture;
             args.Fiability = cost;
-            if (GestureMatchEvent != null)
+            if (GestureMatchEvent != null){
                 GestureMatchEvent(args);
+            }
             ClearData();
         }
         else
