@@ -25,7 +25,7 @@ public class ShowImage : MonoBehaviour
         m_Animator.SetBool("Show",false);
     }
     public void SwitchShowerImage(string name){
-        
+        Debug.Log("SwitchShowerImage"+name);
         m_Animator.SetBool("Show",true);
         aspectRatioFitter.enabled = false;
         Texture texture = Resources.Load<Texture>(name);
@@ -39,7 +39,7 @@ public class ShowImage : MonoBehaviour
         aspectRatioFitter.aspectRatio =  (float)(imageShower.texture.width)/ imageShower.texture.height;
         aspectRatioFitter.aspectMode = AspectRatioFitter.AspectMode.WidthControlsHeight;
         Debug.LogError(name);
-        if(name!="2399"){
+        if(name!="showImg/2399"){
             rectTranform.sizeDelta= new Vector2(752,rectTranform.sizeDelta.y);
             rectTranform.transform.localScale = Vector3.one * 0.5f;
         }else{
